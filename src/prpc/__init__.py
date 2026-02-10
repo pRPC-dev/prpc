@@ -3,6 +3,7 @@ __version__ = "0.1.0"
 from .cli import app
 from .adapters.fastapi import mount_fastapi
 from .adapters.flask import mount_flask
+from .client.python_client import RPCClient
 from .core.decorators import default_registry, rpc
 from .core.interpreter import handle_request
 from .core.models import RpcRequest, RpcResponse
@@ -21,7 +22,9 @@ __all__ = [
     "asgi_app",
     "mount_fastapi",
     "mount_flask",
+    "RPCClient",
 ]
+
 
 
 

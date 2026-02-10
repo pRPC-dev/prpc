@@ -1,0 +1,25 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\hp\Documents\GitHub\prpc
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.12.1
+collected 25 items
+
+tests\test_asgi.py ...                                                   [ 12%]
+tests\test_cli.py ..                                                     [ 20%]
+tests\test_decorators.py ...                                             [ 32%]
+tests\test_fastapi.py ..                                                 [ 40%]
+tests\test_flask.py ..                                                   [ 48%]
+tests\test_interpreter.py .....                                          [ 68%]
+tests\test_models.py .....                                               [ 88%]
+tests\test_registry.py ...                                               [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\config\__init__.py:1428
+  C:\Users\hp\Documents\GitHub\prpc\.venv\Lib\site-packages\_pytest\config\__init__.py:1428: PytestConfigWarning: Unknown config option: asyncio_mode
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 25 passed, 1 warning in 1.65s ========================

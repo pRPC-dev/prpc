@@ -1,0 +1,113 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\hp\Documents\GitHub\prpc
+configfile: pyproject.toml
+plugins: anyio-4.12.1
+collected 3 items
+
+tests\test_client.py ..F                                                 [100%]
+
+================================== FAILURES ===================================
+__________________________ test_client_sync_success ___________________________
+
+    def test_client_sync_success():
+        @rpc
+        def multiply(a: int, b: int) -> int:
+            return a * b
+    
+        with RPCClient("http://test", is_async=False) as client:
+            # Mocking the internal client to use ASGITransport
+            import httpx
+            client._sync_client = httpx.Client(
+                transport=httpx.ASGITransport(app=asgi_app),
+                base_url="http://test"
+            )
+    
+>           result = client.multiply(10, 2)
+                     ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_client.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\prpc\client\python_client.py:49: in sync_wrapper
+    return self._call_sync(name, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\prpc\client\python_client.py:62: in _call_sync
+    response = client.post("/rpc", json=payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\httpx\_client.py:1144: in post
+    return self.request(
+.venv\Lib\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+.venv\Lib\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv\Lib\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <httpx.Client object at 0x000001BD9A6C3910>
+request = <Request('POST', 'http://test/rpc')>
+
+    def _send_single_request(self, request: Request) -> Response:
+        """
+        Sends a single request, without handling any redirections.
+        """
+        transport = self._transport_for_url(request.url)
+        start = time.perf_counter()
+    
+        if not isinstance(request.stream, SyncByteStream):
+            raise RuntimeError(
+                "Attempted to send an async request with a sync Client instance."
+            )
+    
+        with request_context(request=request):
+>           response = transport.handle_request(request)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'ASGITransport' object has no attribute 'handle_request'
+
+.venv\Lib\site-packages\httpx\_client.py:1014: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_client_sync_success():
+        @rpc
+        def multiply(a: int, b: int) -> int:
+            return a * b
+    
+>       with RPCClient("http://test", is_async=False) as client:
+
+tests\test_client.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\prpc\client\python_client.py:105: in __exit__
+    self.close()
+src\prpc\client\python_client.py:92: in close
+    self._sync_client.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <httpx.Client object at 0x000001BD9A6C3910>
+
+    def close(self) -> None:
+        """
+        Close transport and proxies.
+        """
+        if self._state != ClientState.CLOSED:
+            self._state = ClientState.CLOSED
+    
+>           self._transport.close()
+            ^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'ASGITransport' object has no attribute 'close'
+
+.venv\Lib\site-packages\httpx\_client.py:1270: AttributeError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\config\__init__.py:1428
+  C:\Users\hp\Documents\GitHub\prpc\.venv\Lib\site-packages\_pytest\config\__init__.py:1428: PytestConfigWarning: Unknown config option: asyncio_mode
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_client.py::test_client_sync_success - AttributeError: 'ASGI...
+=================== 1 failed, 2 passed, 1 warning in 0.52s ====================
