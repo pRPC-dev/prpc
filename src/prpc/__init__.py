@@ -2,7 +2,7 @@ __version__ = "0.1.0"
 
 from .adapters.fastapi import mount_fastapi
 from .adapters.flask import mount_flask
-from .cli import app
+from .cli.main import app
 from .client.python_client import RPCClient, RPCError
 from .client.ts_codegen import generate_typescript_client, save_typescript_client
 from .core.decorators import default_registry, rpc
