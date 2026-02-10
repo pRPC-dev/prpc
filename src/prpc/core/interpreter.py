@@ -3,7 +3,7 @@ import inspect
 from typing import Any, Dict
 
 from .decorators import default_registry
-from .models import RpcRequest, RpcResponse
+from .models import RpcErrorModel, RpcRequest, RpcResponse
 
 
 async def handle_request(payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -25,7 +25,8 @@ async def handle_request(payload: Dict[str, Any]) -> Dict[str, Any]:
         procedure = default_registry.get(request.method)
         if not procedure:
             return RpcResponse(
-                id=request_id, error=f"Method not found: {request.method}"
+                id=request_id,
+                error=RpcErrorModel(code=404, message=f"Method not found: {request.method}"),
             ).model_dump()
 
         # 3. Call Function (support both sync and async)
@@ -44,8 +45,12 @@ async def handle_request(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 
         except Exception as e:
-            return RpcResponse(id=request_id, error=str(e)).model_dump()
+            return RpcResponse(
+                id=request_id, error=RpcErrorModel(code=500, message=str(e))
+            ).model_dump()
 
     except Exception as e:
         # Handle parsing errors or other unexpected errors
-        return RpcResponse(id=request_id, error=f"Invalid request: {str(e)}").model_dump()
+        return RpcResponse(
+            id=request_id, error=RpcErrorModel(code=400, message=f"Invalid request: {str(e)}")
+        ).model_dump()

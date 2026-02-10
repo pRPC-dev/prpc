@@ -13,11 +13,16 @@ class RpcRequest(BaseModel):
     params: Optional[Union[List[Any], Dict[str, Any]]] = None
 
 
+class RpcErrorModel(BaseModel):
+    code: int
+    message: str
+
+
 class RpcResponse(BaseModel):
     """
     Represents an RPC response.
     """
 
-    id: Optional[Union[str, int]] = None
+    id: Optional[Union[int, str]] = None
     result: Optional[Any] = None
-    error: Optional[str] = None
+    error: Optional[RpcErrorModel] = None

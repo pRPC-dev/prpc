@@ -38,7 +38,8 @@ async def test_handle_request_not_found():
     
     assert response["id"] == 1
     assert response["result"] is None
-    assert "Method not found" in response["error"]
+    assert response["error"]["code"] == 404
+    assert "Method not found" in response["error"]["message"]
 
 @pytest.mark.anyio
 async def test_handle_request_exception():
@@ -51,7 +52,8 @@ async def test_handle_request_exception():
     
     assert response["id"] == "err"
     assert response["result"] is None
-    assert "Boom" in response["error"]
+    assert response["error"]["code"] == 500
+    assert "Boom" in response["error"]["message"]
 
 @pytest.mark.anyio
 async def test_handle_request_invalid_payload():
@@ -59,5 +61,7 @@ async def test_handle_request_invalid_payload():
     response = await handle_request(payload)
     
     assert response["id"] == 1
-    assert "Invalid request" in response["error"]
+    assert response["error"]["code"] == 400
+    assert "Invalid request" in response["error"]["message"]
+
 

@@ -4,17 +4,72 @@ rootdir: C:\Users\hp\Documents\GitHub\prpc
 configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.12.1
-collected 25 items
+collected 28 items
 
-tests\test_asgi.py ...                                                   [ 12%]
-tests\test_cli.py ..                                                     [ 20%]
-tests\test_decorators.py ...                                             [ 32%]
-tests\test_fastapi.py ..                                                 [ 40%]
-tests\test_flask.py ..                                                   [ 48%]
-tests\test_interpreter.py .....                                          [ 68%]
-tests\test_models.py .....                                               [ 88%]
+tests\test_asgi.py ...                                                   [ 10%]
+tests\test_cli.py ..                                                     [ 17%]
+tests\test_client.py ..F                                                 [ 28%]
+tests\test_decorators.py ...                                             [ 39%]
+tests\test_fastapi.py ..                                                 [ 46%]
+tests\test_flask.py ..                                                   [ 53%]
+tests\test_interpreter.py .....                                          [ 71%]
+tests\test_models.py .....                                               [ 89%]
 tests\test_registry.py ...                                               [100%]
 
+================================== FAILURES ===================================
+__________________________ test_client_sync_success ___________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026D8DBEE5D0>
+
+    def test_client_sync_success(monkeypatch):
+        @rpc
+        def multiply(a: int, b: int) -> int:
+            return a * b
+    
+        with RPCClient("http://test") as client:
+            # Instead of transport (which is hard for sync/asgi), mock the client post
+            import httpx
+            def mock_post(*args, **kwargs):
+                payload = kwargs.get("json")
+                # Minimal simulation of handle_request
+                return httpx.Response(
+                    200,
+                    json={"id": payload["id"], "result": 20, "error": None}
+                )
+    
+            monkeypatch.setattr(client._sync_client, "post", mock_post)
+    
+            # Test dynamic sync call
+>           result = client.multiply(10, 2)
+                     ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_client.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\prpc\client\python_client.py:128: in __call__
+    return self.client.call_sync(self.method, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\prpc\client\python_client.py:74: in call_sync
+    return self._handle_response(response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\prpc\client\python_client.py:90: in _handle_response
+    response.raise_for_status()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Response [200 OK]>
+
+    def raise_for_status(self) -> Response:
+        """
+        Raise the `HTTPStatusError` if one occurred.
+        """
+        request = self._request
+        if request is None:
+>           raise RuntimeError(
+                "Cannot call `raise_for_status` as the request "
+                "instance has not been set on this response."
+            )
+E           RuntimeError: Cannot call `raise_for_status` as the request instance has not been set on this response.
+
+.venv\Lib\site-packages\httpx\_models.py:800: RuntimeError
 ============================== warnings summary ===============================
 .venv\Lib\site-packages\_pytest\config\__init__.py:1428
   C:\Users\hp\Documents\GitHub\prpc\.venv\Lib\site-packages\_pytest\config\__init__.py:1428: PytestConfigWarning: Unknown config option: asyncio_mode
@@ -22,4 +77,6 @@ tests\test_registry.py ...                                               [100%]
     self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-======================== 25 passed, 1 warning in 1.65s ========================
+=========================== short test summary info ===========================
+FAILED tests/test_client.py::test_client_sync_success - RuntimeError: Cannot ...
+=================== 1 failed, 27 passed, 1 warning in 3.38s ===================

@@ -21,9 +21,14 @@ def test_rpc_response_serialization():
     assert data == {"id": 1, "result": {"status": "ok"}, "error": None}
 
 def test_rpc_response_error():
-    res = RpcResponse(id=1, error="Procedure not found")
+    res = RpcResponse(id=1, error={"code": 404, "message": "Procedure not found"})
     data = res.model_dump()
-    assert data == {"id": 1, "result": None, "error": "Procedure not found"}
+    assert data == {
+        "id": 1,
+        "result": None,
+        "error": {"code": 404, "message": "Procedure not found"},
+    }
+
 
 def test_rpc_request_invalid():
     from pydantic import ValidationError
