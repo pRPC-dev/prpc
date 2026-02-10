@@ -1,0 +1,65 @@
+---
+title: Server Setup
+description: Defining RPC procedures and mounting them to your app.
+---
+
+Server-side pRPC is centered around the `@rpc` decorator and framework adapters.
+
+## Defining Procedures
+
+Any Python function can be an RPC procedure. pRPC uses your type hints to validate inputs and generate schemas.
+
+```python
+from prpc import rpc
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+
+@rpc
+async def get_user(user_id: int) -> User:
+    # Logic to fetch user...
+    return User(id=user_id, name="pRPC User")
+```
+
+### Async and Sync Support
+- **Async**: Recommended for high performance (uses `asyncio`).
+- **Sync**: Fully supported (executed in a thread pool for ASGI apps).
+
+## Adapters
+
+### FastAPI
+Use `mount_fastapi` to expose your procedures on the `/rpc` endpoint.
+
+```python
+from prpc_fastapi import mount_fastapi
+from fastapi import FastAPI
+
+app = FastAPI()
+mount_fastapi(app)
+```
+
+### Flask
+For Flask apps, use `mount_flask`.
+
+```python
+from prpc_flask import mount_flask
+from flask import Flask
+
+app = Flask(__name__)
+mount_flask(app)
+```
+
+## Custom Registry
+By default, procedures are registered in the `default_registry`. You can also create and manage your own `ProcedureRegistry`.
+
+```python
+from prpc import ProcedureRegistry
+
+my_registry = ProcedureRegistry()
+
+@rpc(registry=my_registry)
+def custom_proc():
+    pass
+```
