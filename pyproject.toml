@@ -3,44 +3,40 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "prpc"
+name = "prpc-workspace"
 version = "0.1.0"
-description = "A modern Python library for prpc"
-readme = "README.md"
+description = "pRPC Monorepo Workspace"
 requires-python = ">=3.11"
-license = { text = "MIT" }
-authors = [
-    { name = "AtnatewosH", email = "codesnate@gmail.com" }
-]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-dependencies = [
-    "pydantic>=2.0",
-    "httpx>=0.24.0",
-    "anyio>=4.0",
-    "typer[all]>=0.9.0",
-    "rich>=13.0.0",
-    "jinja2>=3.1.0",
-    "uvicorn>=0.23.0",
-]
+dependencies = []
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
-    "ruff>=0.1.0",
     "fastapi>=0.100.0",
     "flask>=3.0.0",
     "httpx>=0.24.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.0.0",
+    "jinja2>=3.1.0",
+    "uvicorn>=0.23.0",
+    "anyio>=4.0",
+    "pydantic>=2.0",
 ]
 
-[project.scripts]
-prpc = "prpc.cli.main:app"
+
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+prpc = { workspace = true }
+prpc-fastapi = { workspace = true }
+prpc-flask = { workspace = true }
+prpc-codegen = { workspace = true }
+
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/prpc"]
+bypass-selection = true
 
 [tool.ruff]
 select = ["E", "F", "B", "I"]
@@ -49,5 +45,10 @@ target-version = "py311"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = [
+    "packages/prpc/src",
+    "packages/prpc-fastapi/src",
+    "packages/prpc-flask/src",
+    "packages/prpc-codegen/src"
+]
 asyncio_mode = "auto"

@@ -1,6 +1,6 @@
-from fastapi import FastAPI
-from prpc import rpc, mount_fastapi
-import uvicorn
+from prpc import rpc
+from prpc_fastapi import mount_fastapi
+
 
 app = FastAPI(title="pRPC Basic Example")
 

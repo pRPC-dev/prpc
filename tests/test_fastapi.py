@@ -1,7 +1,8 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from prpc import rpc, mount_fastapi, default_registry
+from prpc import rpc, default_registry
+from prpc_fastapi import mount_fastapi
 
 @pytest.fixture(autouse=True)
 def clear_registry():

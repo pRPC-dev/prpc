@@ -1,5 +1,6 @@
 import pytest
-from prpc import rpc, default_registry, generate_typescript_client
+from prpc import rpc, default_registry
+from prpc_codegen import generate_typescript_client
 
 @pytest.fixture(autouse=True)
 def clear_registry():
