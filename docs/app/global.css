@@ -3,31 +3,43 @@
 @import 'fumadocs-ui/css/preset.css';
 
 :root {
-  /* Site Header Height (h-14 in Fumadocs HomeLayout) */
   --fd-header-height: 3.5rem;
+  --fd-layout-width: 100%;
 }
 
 /* Ensure the HomeLayout main content fills the screen properly */
 #nd-home-layout {
   min-height: calc(100vh - var(--fd-header-height));
+  --fd-layout-width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 
-DocsLayout uses its own grid. 
-Since it's nested in HomeLayout, it starts below the header.
-However, we need to ensure its internal spacing respects the global header if needed.
-*/
+/* Push navigation elements to the left and expand to full width */
+#nd-nav>div {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  max-width: none !important;
+  width: 100% !important;
+}
 
 #nd-docs-layout {
-  /* Internal sub-nav is disabled, but we want the sidebar to maintain its top offset */
   --fd-nav-height: 0px;
+  --fd-layout-width: 100%;
+  width: 100%;
+  display: grid;
 }
 
+/* Ensure the documentation container itself isn't centered */
+#nd-docs-layout>div {
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+/* Ensure sidebar and toc start from the edge */
 .fd-sidebar,
 .fd-toc {
-  /* If needed, force top offset to align with the global navbar */
-  /* But since it's nested, it might already be correct. 
-     We use position: sticky relative to viewport, so we need the offset. */
   top: var(--fd-header-height) !important;
   height: calc(100vh - var(--fd-header-height)) !important;
 }
