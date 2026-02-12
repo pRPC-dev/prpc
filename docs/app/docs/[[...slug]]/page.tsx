@@ -1,5 +1,5 @@
 import { getPageImage, source } from '@/lib/source';
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page';
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from '@/components/layout/docs/page';
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
@@ -9,6 +9,11 @@ import { gitConfig } from '@/lib/layout.shared';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
+  // Redirect /docs to get-started (Introduction)
+  if (!params.slug || params.slug.length === 0) {
+    const { permanentRedirect } = await import('next/navigation');
+    permanentRedirect('/docs/get-started');
+  }
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
@@ -44,6 +49,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
   const params = await props.params;
+  if (!params.slug || params.slug.length === 0) {
+    return { title: 'Docs', description: 'pRPC Documentation' };
+  }
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
